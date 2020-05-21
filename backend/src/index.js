@@ -1,5 +1,7 @@
 const express = require("express");
 const morgan = require("morgan");
+// const mongoose = require("moongose");
+require('./database');
 
 const routes = require("./routes");
 
