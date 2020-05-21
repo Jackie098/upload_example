@@ -1,10 +1,11 @@
 const multer = require('multer');
 const path = require('path');
 const crypto = require('crypto');
+const aws = require("aws-sdk");
+const multerS3 = require('multer-s3');
 
-module.exports =  {
-  dest: path.resolve(__dirname, '..', '..', 'tmp', 'uploads'),
-  storage: multer.diskStorage({
+const storageTypes = {
+  local:  multer.diskStorage({
     destination: (req, file, callback) => {
       callback(null, path.resolve(__dirname, '..', '..', 'tmp', 'uploads'))
     },
@@ -12,12 +13,33 @@ module.exports =  {
       crypto.randomBytes(16, (err, hash) => {
         if(err) callback(err);
 
+        file.key = `${hash.toString('hex')}-${file.originalname}`;
+
+        callback(null, file.key);
+      });
+    },
+  }),
+
+  s3: multerS3({
+    s3: new aws.S3(),
+    bucket: 'uploadexample3215',
+    contentType: multerS3.AUTO_CONTENT_TYPE, //Essa declaração nos permite abrir a imagem no navegador ao invès de forçar o download
+    acl:'public-read', //permissão de leitura
+    key: (req, file, callback) => {
+      crypto.randomBytes(16, (err, hash) => {
+        if(err) callback(err);
+
         const fileName = `${hash.toString('hex')}-${file.originalname}`;
 
         callback(null, fileName);
       });
-    },
+    }
   }),
+}
+
+module.exports =  {
+  dest: path.resolve(__dirname, '..', '..', 'tmp', 'uploads'),
+  storage: storageTypes["s3"],
   limits: {
     /** 
      * A ideia é transformar o tamanho máximo do arquivo que será medido em 
