@@ -22,7 +22,7 @@ const storageTypes = {
 
   s3: multerS3({
     s3: new aws.S3(),
-    bucket: 'uploadexample3215',
+    bucket: process.env.AWS_BUCKET,
     contentType: multerS3.AUTO_CONTENT_TYPE, //Essa declaração nos permite abrir a imagem no navegador ao invès de forçar o download
     acl:'public-read', //permissão de leitura
     key: (req, file, callback) => {
@@ -39,7 +39,7 @@ const storageTypes = {
 
 module.exports =  {
   dest: path.resolve(__dirname, '..', '..', 'tmp', 'uploads'),
-  storage: storageTypes["s3"],
+  storage: storageTypes[process.env.STORAGE_TYPE],
   limits: {
     /** 
      * A ideia é transformar o tamanho máximo do arquivo que será medido em 
