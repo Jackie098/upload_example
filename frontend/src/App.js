@@ -1,6 +1,8 @@
-import React, { Component, useState } from 'react';
+import React, { Component } from 'react';
 import { uniqueId } from 'lodash'; //Para gerar ID único
 import filesize from 'filesize';  //Para controlar a nomenclatura do tamanho de uma imagem
+
+import api from './services/api';
 
 import GlobalStyle from './styles/global';
 import { Container, Content } from './styles';
@@ -29,8 +31,53 @@ class App extends Component {
 
     this.setState({
       uploadedFiles: this.state.uploadedFiles.concat(uploadedFiles)
-    })
+    });
+
+    uploadedFiles.forEach(this.processUpload);
   };
+
+  updateFile = (id, data) => {
+    this.setState({ uploadedFiles: this.state.uploadedFiles.map(uploadedFile => 
+      {
+        return id === uploadedFile.id 
+          ? {...uploadedFile, ...data } 
+          : uploadedFile;
+      })
+    });
+  }
+
+  processUpload = (uploadedFile) => {
+    /**
+     * A ideia é criar um objeto de formulário, quando o HTML passa os dados de
+     * um formulário para o JS ele fica nesse formato (do objeto FormData)
+     */
+    const data = new FormData();
+
+    data.append('file', uploadedFile.file, uploadedFile.name);
+
+    api
+      .post('uploads', data, {
+        onUploadProgress: e => {
+          const progress = parseInt(Math.round((e.loaded * 100) / e.total));
+        
+          this.updateFile(uploadedFile.id, {
+            progress,
+          })
+        }
+      })
+      .then(response => {
+        this.updateFile(uploadedFile.id, {
+          uploaded: true,
+          id: response.data._id, //underline é por causa do mongoDB, ele salva os dados assim
+          url: response.data.url
+        });
+      })
+      .catch(() => {
+        this.updateFile(uploadedFile.id, {
+          error: true
+        });
+      });
+  }
 
   render(){
     const { uploadedFiles } = this.state;
