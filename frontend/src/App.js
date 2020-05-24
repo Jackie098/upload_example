@@ -70,7 +70,6 @@ class App extends Component {
 
     data.append('file', uploadedFile.file, uploadedFile.name);
 
-<<<<<<< HEAD
     api
       .post('uploads', data, {
         onUploadProgress: e => {
@@ -107,19 +106,6 @@ class App extends Component {
     this.state.uploadedFiles.forEach(file => URL.revokeObjectURL(file.preview));
   }
 
-=======
-    api.post('uploads', data, {
-      onUploadProgress: e => {
-        const progress = parseInt(Math.round((e.loaded * 100) / e.total));
-      
-        this.updateFile(uploadedFile.id, {
-          progress,
-        })
-      }
-    });
-  }
-
->>>>>>> 2c159c2aa1a334da6a7b8160ffab3090740fec6b
   render(){
     const { uploadedFiles } = this.state;
 
