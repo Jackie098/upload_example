@@ -16,6 +16,21 @@ class App extends Component {
     uploadedFiles: [],
   };
 
+  async componentDidMount() {
+    const response = await api.get('uploads');
+
+    this.setState({
+      uploadedFiles: response.data.map(file => ({
+        id: file._id,
+        name: file.name,
+        readableSize: filesize(file.size),
+        preview: file.url,
+        uploaded: true,
+        url: file.url,
+      }))
+    })
+  }
+
   handleUpload = files => {
     const uploadedFiles = files.map(file => ({  //criando um array de objetos
       file,
@@ -80,11 +95,15 @@ class App extends Component {
   }
 
   handleDelete = async id => {
-    await api.delete(`updates/${id}`);
+    await api.delete(`uploads/${id}`);
 
     this.setState ({
       uploadedFiles: this.state.uploadedFiles.filter(file => file.id !== id),
     });
+  }
+
+  componentWillUnmount() {
+    this.state.uploadedFiles.forEach(file => URL.revokeObjectURL(file.preview));
   }
 
   render(){

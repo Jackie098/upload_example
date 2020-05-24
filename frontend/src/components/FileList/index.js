@@ -16,7 +16,7 @@ const FileList = ({ files, onDelete }) => (
               {uploadedFile.readableSize}{" "}
 
               {!!uploadedFile.url && (
-                <button onClick={onDelete(uploadedFile.id)}>Excluir</button>
+                <button onClick={() => onDelete(uploadedFile.id)}>Excluir</button>
               )}
             </span>
           </div>
@@ -37,7 +37,7 @@ const FileList = ({ files, onDelete }) => (
           {
             uploadedFile.url && (
               <a 
-              href="http://localhost:3000/files/d9fe483e486648c87735364695c9418f-logo.jpeg"
+              href={uploadedFile.url}
               target="_blank"
               rel="noopener noreferrer"
               >
